@@ -2,6 +2,8 @@
 
 An access layer for reading values from external providers, with consistent semantics and composition. While called `go-secrets`, this library is also designed to work well with configuration management systems. 
 
+**go-secrets does not manage secret rotation, encryption, or lifecycle.** 
+
 ## Out-of-the-box Providers
 
 go-secrets provides out-of-the-box support for the following providers:

@@ -12,6 +12,10 @@ import (
 )
 
 func main() {
+	// Normally, set outside of Go
+	_ = os.Setenv("KEY_READ_FROM_ENV", "hello_world")
+	_ = os.Setenv("ENV", "dev")
+
 	chained := go_secrets_transformers.ChainTransformers(
 		go_secrets_transformers.NewEnvTransformer(),
 		go_secrets_transformers.NewGenericTransformer(func(s string) string {
@@ -21,8 +25,8 @@ func main() {
 
 	provider := go_secrets_providers.NewTestingProvider(func(s string) string {
 		switch s {
-		case "/env/hello":
-			return "AJHH"
+		case "/dev/hello_world":
+			return "this_is_a_value"
 		default:
 			return "???"
 		}
@@ -33,7 +37,7 @@ func main() {
 		go_secrets.WithTransformer(go_secrets_types.Channel_Config, chained),
 	)
 
-	out, err := secrets.Get(context.Background(), go_secrets_types.Channel_Config, "AHAHAHA")
+	out, err := secrets.Get(context.Background(), go_secrets_types.Channel_Config, "KEY_READ_FROM_ENV")
 
 	if err != nil {
 		fmt.Println("Error:", err)

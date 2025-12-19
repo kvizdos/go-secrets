@@ -84,3 +84,7 @@ func TestSomething(t *testing.T) {
 	// Run somethign that depends on a provider / svc
 }
 ```
+
+### 4. Fully Tested
+
+This library is fully tested using a combination of unit tests and integration tests. The unit tests cover the core functionality of the library, while the integration tests ensure that the library works correctly with various providers and configurations (via TestContainers).

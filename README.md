@@ -8,6 +8,7 @@ go-secrets provides out-of-the-box support for the following providers:
 
 - [x] Environment Variables
 - [x] AWS Secrets Manager
+- [x] AWS Systems Manager (SSM)
 - [ ] Hashicorp Vault (open a PR, plz!)
 - [ ] BitWarden Secrets Manager (open a PR, plz!)
 

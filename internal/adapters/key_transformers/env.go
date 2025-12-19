@@ -28,7 +28,7 @@ func (r *envKeyTransformer) Transform(key string) string {
 	realKey := r.get(key)
 
 	if realKey == "" {
-		panic(fmt.Sprintf("Missing key transform for %s", key))
+		panic(fmt.Errorf("Missing key transform for '%s'", key))
 	}
 
 	return realKey

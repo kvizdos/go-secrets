@@ -11,4 +11,6 @@ var (
 	ErrLookupFailed          = errors.New("lookup failed")
 	ErrExecutionFail         = errors.New("secret execution error")
 	ErrProviderNotConfigured = errors.New("provider not configured")
+
+	ErrSecretIDInvalid = errors.New("secret ID is invalid")
 )

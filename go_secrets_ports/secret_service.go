@@ -8,6 +8,7 @@ import (
 
 type SecretService interface {
 	RegisterChannel(channelName go_secrets_types.Channel, provider SecretProvider)
+	RegisterTransformer(channelName go_secrets_types.Channel, transformer Transformer)
 
 	SecretServiceGetter
 	SecretServiceExecutor

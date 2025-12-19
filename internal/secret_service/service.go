@@ -12,8 +12,10 @@ import (
 var _ go_secrets_ports.SecretService = (*GoSecrets)(nil)
 
 type GoSecrets struct {
-	mu        sync.Mutex
-	providers map[go_secrets_types.Channel]go_secrets_ports.SecretProvider
+	mu sync.Mutex
+
+	transformers map[go_secrets_types.Channel]go_secrets_ports.Transformer
+	providers    map[go_secrets_types.Channel]go_secrets_ports.SecretProvider
 }
 
 func (gs *GoSecrets) RegisterChannel(channelName go_secrets_types.Channel, provider go_secrets_ports.SecretProvider) {
@@ -26,12 +28,28 @@ func (gs *GoSecrets) RegisterChannel(channelName go_secrets_types.Channel, provi
 	gs.providers[channelName] = provider
 }
 
+func (gs *GoSecrets) RegisterTransformer(channelName go_secrets_types.Channel, transformer go_secrets_ports.Transformer) {
+	gs.mu.Lock()
+	defer gs.mu.Unlock()
+
+	if gs.transformers == nil {
+		gs.transformers = make(map[go_secrets_types.Channel]go_secrets_ports.Transformer)
+	}
+	gs.transformers[channelName] = transformer
+}
+
 func (gs *GoSecrets) Get(ctx context.Context, channel go_secrets_types.Channel, key string) (string, error) {
 	if key == "" {
 		return "", go_secrets_types.ErrSecretKeyEmpty
 	}
 
 	if provider, ok := gs.providers[channel]; ok {
+		transformer, ok := gs.transformers[channel]
+
+		if ok {
+			key = transformer.Transform(key)
+		}
+
 		return provider.Get(ctx, key)
 	}
 

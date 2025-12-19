@@ -88,3 +88,40 @@ func TestSomething(t *testing.T) {
 ### 4. Fully Tested
 
 This library is fully tested using a combination of unit tests and integration tests. The unit tests cover the core functionality of the library, while the integration tests ensure that the library works correctly with various providers and configurations (via TestContainers).
+
+## Key Transformations
+
+Key names should NOT live within code. With `go-secrets`, you can define a transformer that will be applied to all keys before they are fetched from the channel. This allows you to define a consistent naming convention for your secrets and configuration values:
+
+```go
+env := go_secrets_transformers.NewEnvTransformer()
+
+secrets := go_secrets.New(
+	//...
+	go_secrets.WithTransformer(go_secrets_types.Channel_Config, env),
+)
+```
+
+You can also chain multiple transformers together:
+
+```go
+chained := go_secrets_transformers.ChainTransformers(
+	go_secrets_transformers.NewEnvTransformer(), // Executed FIRST
+	go_secrets_transformers.NewGenericTransformer(func(s string) string {  // ^ Result flows into this line.
+		return fmt.Sprintf("/%s/%s", os.Getenv("ENV"), s)
+	}),
+)
+
+secrets := go_secrets.New(
+	//...
+	go_secrets.WithTransformer(go_secrets_types.Channel_Config, chained),
+)
+```
+
+If you would like to define a custom transformer, it is as easy as implementing the `Transformer` interface:
+
+```go
+type Transformer interface {
+	Transform(string) string
+}
+```

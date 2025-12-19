@@ -33,3 +33,9 @@ func WithCustomChannel(channel go_secrets_types.Channel, provider go_secrets_por
 		gs.RegisterChannel(channel, provider)
 	}
 }
+
+func WithTransformer(channel go_secrets_types.Channel, transformer go_secrets_ports.Transformer) GoSecretsOption {
+	return func(gs go_secrets_ports.SecretService) {
+		gs.RegisterTransformer(channel, transformer)
+	}
+}

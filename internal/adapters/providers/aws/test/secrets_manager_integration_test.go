@@ -11,17 +11,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/ssm"
-	"github.com/aws/aws-sdk-go-v2/service/ssm/types"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/localstack"
-
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/kvizdos/go-secrets/go_secrets_ports"
 	secret_providers_aws "github.com/kvizdos/go-secrets/internal/adapters/providers/aws"
 	secret_providers_test "github.com/kvizdos/go-secrets/internal/adapters/providers/test"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/localstack"
 )
 
-func TestSSM_Contract_Integration(t *testing.T) {
+func TestSecretsManager_Contract_Integration(t *testing.T) {
 	ctx := context.Background()
 
 	ls, err := localstack.Run(ctx, "localstack/localstack:latest")
@@ -58,28 +56,36 @@ func TestSSM_Contract_Integration(t *testing.T) {
 		t.Fatalf("aws config: %v", err)
 	}
 
-	ssmClient := ssm.NewFromConfig(cfg, func(o *ssm.Options) {
+	smClient := secretsmanager.NewFromConfig(cfg, func(o *secretsmanager.Options) {
 		o.BaseEndpoint = aws.String(endpoint)
 	})
 
-	seedSSM(t, ctx, ssmClient)
+	seedSecretsManager(t, ctx, smClient)
 
+	// Secrets Manager allows empty strings, but your contract normalizes them away,
+	// so pass `true` to enable the empty-value contract cases.
 	secret_providers_test.AssertSecretProviderContract(t, true, func() go_secrets_ports.SecretProvider {
-		return secret_providers_aws.NewSSMWithClient(ssmClient)
+		return secret_providers_aws.NewSecretsManagerWithClient(smClient)
 	})
 }
 
-func seedSSM(t *testing.T, ctx context.Context, c *ssm.Client) {
+func seedSecretsManager(t *testing.T, ctx context.Context, c *secretsmanager.Client) {
 	t.Helper()
 
-	_, err := c.PutParameter(ctx, &ssm.PutParameterInput{
-		Name:      aws.String("/key"),
-		Type:      types.ParameterTypeSecureString,
-		Value:     aws.String("secret"),
-		Overwrite: aws.Bool(true),
+	_, err := c.CreateSecret(ctx, &secretsmanager.CreateSecretInput{
+		Name:         aws.String("/key"),
+		SecretString: aws.String("secret"),
 	})
 	if err != nil {
-		t.Fatalf("put /key: %v", err)
+		t.Fatalf("create /key: %v", err)
 	}
 
+	// Optional: seed empty secret if you want the empty-value path exercised
+	_, err = c.CreateSecret(ctx, &secretsmanager.CreateSecretInput{
+		Name:         aws.String("/empty"),
+		SecretString: aws.String(""),
+	})
+	if err != nil {
+		t.Fatalf("create /empty: %v", err)
+	}
 }

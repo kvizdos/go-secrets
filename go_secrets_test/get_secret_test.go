@@ -21,8 +21,8 @@ func TestGetEmptyKey(t *testing.T) {
 		go_secrets.WithConfigProvider(demoProvider),
 	)
 
-	for _, valueType := range []go_secrets_types.GoSecretType{go_secrets_types.SECRET, go_secrets_types.CONFIG} {
-		_, err := secrets.Get(context.Background(), valueType, "")
+	for _, channel := range []go_secrets_types.Channel{go_secrets_types.Channel_Secrets, go_secrets_types.Channel_Config} {
+		_, err := secrets.Get(context.Background(), channel, "")
 
 		if !errors.Is(err, go_secrets_types.ErrSecretKeyEmpty) {
 			t.Errorf("Expected error for empty key")
@@ -41,8 +41,8 @@ func TestGetFound(t *testing.T) {
 		go_secrets.WithConfigProvider(demoProvider),
 	)
 
-	for _, valueType := range []go_secrets_types.GoSecretType{go_secrets_types.SECRET, go_secrets_types.CONFIG} {
-		value, err := secrets.Get(context.Background(), valueType, "DemoKey")
+	for _, channel := range []go_secrets_types.Channel{go_secrets_types.Channel_Secrets, go_secrets_types.Channel_Config} {
+		value, err := secrets.Get(context.Background(), channel, "DemoKey")
 
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
@@ -65,8 +65,8 @@ func TestGetNotFound(t *testing.T) {
 		go_secrets.WithConfigProvider(demoProvider),
 	)
 
-	for _, valueType := range []go_secrets_types.GoSecretType{go_secrets_types.SECRET, go_secrets_types.CONFIG} {
-		_, err := secrets.Get(context.Background(), valueType, "DemoKey")
+	for _, channel := range []go_secrets_types.Channel{go_secrets_types.Channel_Secrets, go_secrets_types.Channel_Config} {
+		_, err := secrets.Get(context.Background(), channel, "DemoKey")
 
 		if err == nil {
 			t.Fatalf("Expected err!")
@@ -81,8 +81,8 @@ func TestGetNotFound(t *testing.T) {
 func TestGetNotConfigured(t *testing.T) {
 	secrets := go_secrets.New()
 
-	for _, valueType := range []go_secrets_types.GoSecretType{go_secrets_types.SECRET, go_secrets_types.CONFIG} {
-		_, err := secrets.Get(context.Background(), valueType, "DemoKey")
+	for _, channel := range []go_secrets_types.Channel{go_secrets_types.Channel_Secrets, go_secrets_types.Channel_Config} {
+		_, err := secrets.Get(context.Background(), channel, "DemoKey")
 
 		if err == nil {
 			t.Fatalf("Expected err!")

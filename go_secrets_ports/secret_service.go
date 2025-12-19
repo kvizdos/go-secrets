@@ -7,17 +7,16 @@ import (
 )
 
 type SecretService interface {
-	SetSecretProvider(provider SecretProvider)
-	SetConfigProvider(provider SecretProvider)
+	RegisterChannel(channelName go_secrets_types.Channel, provider SecretProvider)
 
 	SecretServiceGetter
 	SecretServiceExecutor
 }
 
 type SecretServiceGetter interface {
-	Get(ctx context.Context, valueType go_secrets_types.GoSecretType, key string) (string, error)
+	Get(ctx context.Context, channel go_secrets_types.Channel, key string) (string, error)
 }
 
 type SecretServiceExecutor interface {
-	ExecuteSecret(ctx context.Context, key string, do func(string) error) error
+	ExecuteSecret(ctx context.Context, channel go_secrets_types.Channel, key string, do func(string) error) error
 }

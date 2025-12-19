@@ -12,3 +12,13 @@ func NewEnvProvider() go_secrets_ports.SecretProvider {
 func NewTestingProvider(getter func(string) string) go_secrets_ports.SecretProvider {
 	return secret_providers.NewEnvSecretProvider(getter)
 }
+
+func NewTestingMappedProvider(input map[string]string) go_secrets_ports.SecretProvider {
+	getter := func(key string) string {
+		if v, ok := input[key]; ok {
+			return v
+		}
+		return ""
+	}
+	return secret_providers.NewEnvSecretProvider(getter)
+}

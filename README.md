@@ -16,8 +16,8 @@ go-secrets provides out-of-the-box support for the following providers:
 
 Preflights are used to run logic before a secret is retrieved. This can be useful for caching secrets or ensuring that a secret is only retrieved once:
 
-- [x] Cache TTL
-- [x] Single Flight
+- [x] **Cache TTL**: A preflight that caches the result of a secret lookup for a specified duration.
+- [x] **Single Flight**: A preflight that ensures that a secret is only retrieved once per instance.
 
 ```go
 wrappedProvider := go_secrets_providers.WithPreflights(

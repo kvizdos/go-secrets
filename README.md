@@ -1,6 +1,6 @@
 # go-secrets
 
-An access layer for reading values from external providers, with consistent semantics and composition.
+An access layer for reading values from external providers, with consistent semantics and composition. While called `go-secrets`, this library is also designed to work well with configuration management systems. 
 
 ## Out-of-the-box Providers
 
